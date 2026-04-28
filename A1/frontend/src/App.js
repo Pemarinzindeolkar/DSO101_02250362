@@ -8,13 +8,20 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [editId, setEditId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchTasks = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(`${API}/tasks`);
       setTasks(res.data);
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
+      setError("");
+    } catch (err) {
+      setError("Failed to load tasks");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -23,90 +30,137 @@ function App() {
   }, []);
 
   const addOrUpdateTask = async () => {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      setError("Please enter a task");
+      return;
+    }
 
+    setLoading(true);
     try {
       if (editId) {
-        await axios.put(`${API}/tasks/${editId}`, { title });
-        setEditId(null);
+        await axios.put(`${API}/tasks/${editId}`, { title: title.trim() });
       } else {
-        await axios.post(`${API}/tasks`, { title });
+        await axios.post(`${API}/tasks`, { title: title.trim() });
       }
-
+      
       setTitle("");
-      fetchTasks();
-    } catch (error) {
-      console.error("Error saving task:", error);
+      setEditId(null);
+      setError("");
+      await fetchTasks();
+    } catch (err) {
+      setError("Failed to save task");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const editTask = (task) => {
     setTitle(task.title);
     setEditId(task.id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const deleteTask = async (id) => {
+    if (!window.confirm("Delete this task?")) return;
+    
+    setLoading(true);
     try {
       await axios.delete(`${API}/tasks/${id}`);
-      fetchTasks();
-    } catch (error) {
-      console.error("Error deleting task:", error);
+      await fetchTasks();
+    } catch (err) {
+      setError("Failed to delete task");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") addOrUpdateTask();
+  const cancelEdit = () => {
+    setTitle("");
+    setEditId(null);
+    setError("");
   };
 
   return (
-    <div className="app-card">
-      <div className="app-header">
-        <h1>
-          ✅ My Tasks
-          {tasks.length > 0 && (
-            <span className="task-count">{tasks.length}</span>
-          )}
-        </h1>
-        <p>Stay organized, stay productive</p>
-      </div>
-
-      <div className="input-row">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="What needs to be done?"
-        />
-        <button className="btn-primary" onClick={addOrUpdateTask}>
-          {editId ? "Update" : "Add"}
-        </button>
-      </div>
-
-      {tasks.length === 0 ? (
-        <div className="empty-state">
-          <div className="icon">📝</div>
-          <p>No tasks yet — add one above!</p>
+    <div className="container">
+      <div className="todo-card">
+        <div className="header">
+          <h1>Task Manager</h1>
+          <p className="subtitle">Organize your day</p>
         </div>
-      ) : (
-        <ul className="task-list">
-          {tasks.map((task) => (
-            <li key={task.id} className="task-item">
-              <span className="task-title">{task.title}</span>
-              <div className="task-actions">
-                <button className="btn-edit" onClick={() => editTask(task)}>
-                  ✏️ Edit
-                </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => deleteTask(task.id)}
-                >
-                  🗑 Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+
+        <div className="input-section">
+          <div className="input-group">
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addOrUpdateTask()}
+              placeholder="What needs to be done?"
+              disabled={loading}
+              autoFocus
+            />
+            {editId && (
+              <button className="btn-cancel" onClick={cancelEdit}>
+                Cancel
+              </button>
+            )}
+            <button 
+              className={editId ? "btn-update" : "btn-add"} 
+              onClick={addOrUpdateTask}
+              disabled={loading}
+            >
+              {loading ? "..." : editId ? "Update" : "Add"}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="error-message">
+            ⚠️ {error}
+          </div>
+        )}
+
+        <div className="stats">
+          <span>📋 Total: {tasks.length}</span>
+          <span>✅ Completed: 0</span>
+        </div>
+
+        {loading && tasks.length === 0 ? (
+          <div className="loading">Loading tasks...</div>
+        ) : tasks.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">📭</div>
+            <p>No tasks yet</p>
+            <small>Add your first task above</small>
+          </div>
+        ) : (
+          <ul className="task-list">
+            {tasks.map((task) => (
+              <li key={task.id} className="task-item">
+                <span className="task-text">{task.title}</span>
+                <div className="task-actions">
+                  <button 
+                    className="btn-edit" 
+                    onClick={() => editTask(task)}
+                    disabled={loading}
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    className="btn-delete" 
+                    onClick={() => deleteTask(task.id)}
+                    disabled={loading}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
