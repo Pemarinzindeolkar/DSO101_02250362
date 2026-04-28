@@ -23,4 +23,4 @@ services:
     dockerContext: ./frontend
     envVars:
       - key: REACT_APP_API_URL
-        value: https://be-todo.onrender.com
+        value: https://be-todo-api.onrender.com  
