@@ -17,7 +17,10 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('A2') {
-                    sh 'npm install'
+                    sh '''
+                        export PATH=/Users/pema/.nvm/versions/node/v20.20.2/bin:$PATH
+                        npm install
+                    '''
                 }
             }
         }
@@ -25,7 +28,10 @@ pipeline {
         stage('Build') {
             steps {
                 dir('A2') {
-                    sh 'npm run build || echo "No build script defined"'
+                    sh '''
+                        export PATH=/Users/pema/.nvm/versions/node/v20.20.2/bin:$PATH
+                        npm run build || echo "No build script defined"
+                    '''
                 }
             }
         }
@@ -33,7 +39,10 @@ pipeline {
         stage('Test') {
             steps {
                 dir('A2') {
-                    sh 'npm test'
+                    sh '''
+                        export PATH=/Users/pema/.nvm/versions/node/v20.20.2/bin:$PATH
+                        npm test
+                    '''
                 }
             }
             post {
@@ -45,15 +54,14 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deployment stage ready - Docker integration optional'
+                echo 'Deployment stage ready'
             }
         }
     }
 
     post {
         always {
-            // cleanWs()  ← COMMENT THIS OUT OR REMOVE IT
-            echo 'Build completed'
+            echo 'Pipeline execution completed'
         }
     }
 }
