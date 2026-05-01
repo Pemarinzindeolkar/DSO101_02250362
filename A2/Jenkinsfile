@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS'   // Make sure this matches your Jenkins NodeJS installation name
+        nodejs 'NodeJS'
     }
 
     stages {
@@ -46,23 +46,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deployment stage ready - Docker integration optional'
-                // Uncomment below if using Docker
-                /*
-                script {
-                    def customImage = docker.build("your-dockerhub-username/a2-app:${env.BUILD_ID}")
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-creds') {
-                        customImage.push()
-                        customImage.push('latest')
-                    }
-                }
-                */
             }
         }
     }
 
     post {
         always {
-            cleanWs()
+            // cleanWs()  ← COMMENT THIS OUT OR REMOVE IT
+            echo 'Build completed'
         }
     }
 }
