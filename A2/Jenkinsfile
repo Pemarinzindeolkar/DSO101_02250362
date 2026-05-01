@@ -55,16 +55,11 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    // Build and tag using full docker path
                     sh """
                         cd A2
                         /usr/local/bin/docker build -t pemarinzindeolkar17/be-todo:latest .
                         /usr/local/bin/docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:${BUILD_NUMBER}
                         /usr/local/bin/docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}
-                    """
-                    
-                    // Push using shell commands instead of docker.withRegistry
-                    sh """
                         echo 'prdeolkar7' | /usr/local/bin/docker login -u pemarinzindeolkar17 --password-stdin
                         /usr/local/bin/docker push pemarinzindeolkar17/be-todo:${BUILD_NUMBER}
                         /usr/local/bin/docker push pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}
@@ -81,7 +76,6 @@ pipeline {
         success {
             echo "🎉 Pipeline completed successfully!"
             echo "📦 Build Number: ${BUILD_NUMBER}"
-            echo "🐳 Docker images pushed with tags: ${BUILD_NUMBER}, jenkins-${BUILD_NUMBER}, latest"
         }
         failure {
             echo "❌ Pipeline failed. Check the logs above."
