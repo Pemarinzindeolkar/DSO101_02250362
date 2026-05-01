@@ -55,10 +55,13 @@ pipeline {
         stage('Docker Push to Hub') {
             steps {
                 script {
-                    // Use your existing local image
+                    // Use full path to docker command
                     sh """
-                        docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:${BUILD_NUMBER}
-                        docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}
+                        /usr/local/bin/docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:${BUILD_NUMBER}
+                        /usr/local/bin/docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}
+                        echo "Using Docker at: /usr/local/bin/docker"
+                        /usr/local/bin/docker --version
+                        echo "Tagged images ready for push"
                     """
                     
                     // Push to Docker Hub using Jenkins credentials
@@ -68,8 +71,8 @@ pipeline {
                         docker.image("pemarinzindeolkar17/be-todo:latest").push()
                     }
                     
-                    echo "Successfully pushed existing image to Docker Hub"
-                    echo "Tags pushed: ${BUILD_NUMBER}, jenkins-${BUILD_NUMBER}, latest"
+                    echo "Successfully pushed to Docker Hub: pemarinzindeolkar17/be-todo:${BUILD_NUMBER}"
+                    echo "View at: https://hub.docker.com/r/pemarinzindeolkar17/be-todo/tags"
                 }
             }
         }
@@ -77,8 +80,9 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline completed successfully!"
-            echo "Docker Hub: https://hub.docker.com/r/pemarinzindeolkar17/be-todo"
+            echo "🎉 Pipeline completed successfully!"
+            echo "📦 Build Number: ${BUILD_NUMBER}"
+            echo "🐳 Docker images pushed with tags: ${BUILD_NUMBER}, jenkins-${BUILD_NUMBER}, latest"
         }
         failure {
             echo "Pipeline failed. Check the logs above."
