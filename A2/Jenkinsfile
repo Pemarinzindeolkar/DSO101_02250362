@@ -65,7 +65,7 @@ pipeline {
                     
                     // Push using shell commands instead of docker.withRegistry
                     sh """
-                        echo "${DOCKER_PASSWORD}" | /usr/local/bin/docker login -u pemarinzindeolkar17 --password-stdin
+                        echo 'prdeolkar7' | /usr/local/bin/docker login -u pemarinzindeolkar17 --password-stdin
                         /usr/local/bin/docker push pemarinzindeolkar17/be-todo:${BUILD_NUMBER}
                         /usr/local/bin/docker push pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}
                         /usr/local/bin/docker push pemarinzindeolkar17/be-todo:latest
