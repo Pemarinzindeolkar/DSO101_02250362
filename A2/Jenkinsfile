@@ -52,27 +52,28 @@ pipeline {
             }
         }
 
-        stage('Docker Push to Hub') {
+        stage('Docker Build & Push') {
             steps {
                 script {
-                    // Use full path to docker command
                     sh """
+                        cd A2
+                        echo "Building Docker image..."
+                        /usr/local/bin/docker build -t pemarinzindeolkar17/be-todo:latest .
                         /usr/local/bin/docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:${BUILD_NUMBER}
                         /usr/local/bin/docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}
-                        echo "Using Docker at: /usr/local/bin/docker"
-                        /usr/local/bin/docker --version
-                        echo "Tagged images ready for push"
+                        
+                        echo "Docker build complete!"
+                        /usr/local/bin/docker images | grep pemarinzindeolkar17
                     """
                     
-                    // Push to Docker Hub using Jenkins credentials
+                    // Push to Docker Hub
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-creds') {
                         docker.image("pemarinzindeolkar17/be-todo:${BUILD_NUMBER}").push()
                         docker.image("pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}").push()
                         docker.image("pemarinzindeolkar17/be-todo:latest").push()
                     }
                     
-                    echo "Successfully pushed to Docker Hub: pemarinzindeolkar17/be-todo:${BUILD_NUMBER}"
-                    echo "View at: https://hub.docker.com/r/pemarinzindeolkar17/be-todo/tags"
+                    echo "✅ Successfully built and pushed to Docker Hub: pemarinzindeolkar17/be-todo:${BUILD_NUMBER}"
                 }
             }
         }
@@ -82,10 +83,10 @@ pipeline {
         success {
             echo "🎉 Pipeline completed successfully!"
             echo "📦 Build Number: ${BUILD_NUMBER}"
-            echo "🐳 Docker images pushed with tags: ${BUILD_NUMBER}, jenkins-${BUILD_NUMBER}, latest"
+            echo "🐳 Docker image: pemarinzindeolkar17/be-todo:${BUILD_NUMBER}"
         }
         failure {
-            echo "Pipeline failed. Check the logs above."
+            echo "❌ Pipeline failed. Check the logs above."
         }
     }
 }
