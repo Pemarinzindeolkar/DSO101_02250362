@@ -52,16 +52,36 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Docker Push to Hub') {
             steps {
-                echo 'Deployment stage ready'
+                script {
+                    // Use your existing local image
+                    sh """
+                        docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:${BUILD_NUMBER}
+                        docker tag pemarinzindeolkar17/be-todo:latest pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}
+                    """
+                    
+                    // Push to Docker Hub using Jenkins credentials
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-creds') {
+                        docker.image("pemarinzindeolkar17/be-todo:${BUILD_NUMBER}").push()
+                        docker.image("pemarinzindeolkar17/be-todo:jenkins-${BUILD_NUMBER}").push()
+                        docker.image("pemarinzindeolkar17/be-todo:latest").push()
+                    }
+                    
+                    echo "Successfully pushed existing image to Docker Hub"
+                    echo "Tags pushed: ${BUILD_NUMBER}, jenkins-${BUILD_NUMBER}, latest"
+                }
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline execution completed'
+        success {
+            echo "Pipeline completed successfully!"
+            echo "Docker Hub: https://hub.docker.com/r/pemarinzindeolkar17/be-todo"
+        }
+        failure {
+            echo "Pipeline failed. Check the logs above."
         }
     }
 }
