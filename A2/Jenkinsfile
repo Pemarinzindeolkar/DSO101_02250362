@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'NodeJS'  // Make sure this matches the name in your Jenkins setup
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/Pemarinzindeolkar/DSO101_02250362.git',
+                    credentialsId: 'github-pat'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('A2') {  // Navigate to A2 folder
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('A2') {
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                dir('A2') {
+                    sh 'npm test'
+                }
+            }
+            post {
+                always {
+                    // Publish test results from A2 folder
+                    junit 'A2/junit.xml'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deployment stage - Ready for Docker integration'
+                // Add Docker commands here when you're ready
+                // docker.build('your-dockerhub-username/a2-app:latest')
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()  // Clean workspace after build completes
+        }
+        success {
+            echo '🎉 Pipeline executed successfully for A2!'
+        }
+        failure {
+            echo '❌ Pipeline failed. Check the logs above.'
+        }
+    }
+}
