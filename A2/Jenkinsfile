@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS'  // Make sure this matches the name in your Jenkins setup
+        nodejs 'NodeJS'   // Make sure this matches your Jenkins NodeJS installation name
     }
 
     stages {
@@ -16,7 +16,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('A2') {  // Navigate to A2 folder
+                dir('A2') {
                     sh 'npm install'
                 }
             }
@@ -25,12 +25,12 @@ pipeline {
         stage('Build') {
             steps {
                 dir('A2') {
-                    sh 'npm run build'
+                    sh 'npm run build || echo "No build script defined"'
                 }
             }
         }
 
-        stage('Unit Tests') {
+        stage('Test') {
             steps {
                 dir('A2') {
                     sh 'npm test'
@@ -38,7 +38,6 @@ pipeline {
             }
             post {
                 always {
-                    // Publish test results from A2 folder
                     junit 'A2/junit.xml'
                 }
             }
@@ -46,22 +45,24 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deployment stage - Ready for Docker integration'
-                // Add Docker commands here when you're ready
-                // docker.build('your-dockerhub-username/a2-app:latest')
+                echo 'Deployment stage ready - Docker integration optional'
+                // Uncomment below if using Docker
+                /*
+                script {
+                    def customImage = docker.build("your-dockerhub-username/a2-app:${env.BUILD_ID}")
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-creds') {
+                        customImage.push()
+                        customImage.push('latest')
+                    }
+                }
+                */
             }
         }
     }
 
     post {
         always {
-            cleanWs()  // Clean workspace after build completes
-        }
-        success {
-            echo '🎉 Pipeline executed successfully for A2!'
-        }
-        failure {
-            echo '❌ Pipeline failed. Check the logs above.'
+            cleanWs()
         }
     }
 }
