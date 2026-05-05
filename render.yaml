@@ -4,8 +4,9 @@ services:
     name: be-todo
     env: docker
     plan: free
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    rootDir: A1
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
     envVars:
       - key: DATABASE_URL
         value: postgresql://my_todo_db_vzjq_user:CjybHWbIalaW1GcEIJBir4Vg9nCNT0bf@dpg-d7odivi8qa3s73ahr2ng-a.singapore-postgres.render.com:5432/my_todo_db_vzjq?sslmode=require
@@ -19,8 +20,9 @@ services:
     name: fe-todo
     env: docker
     plan: free
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
+    rootDir: A1
+    dockerfilePath: frontend/Dockerfile
+    dockerContext: frontend
     envVars:
       - key: REACT_APP_API_URL
-        value: https://be-todo-api.onrender.com  
+        value: https://be-todo-api.onrender.com
