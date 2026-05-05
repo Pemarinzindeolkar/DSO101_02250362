@@ -1,4 +1,8 @@
 # DSO101 Notes
+**Course:** DS0101 - Continuous Integration and Continuous Deployment  
+**Program:** Bachelor's of Engineering in Software Engineering (SWE)  
+**Student:** Pema Rinzin Deolkar  
+**GitHub Repository:** [DSO101_02250362](https://github.com/Pemarinzindeolkar/DSO101_02250362)
 
 ---
 
@@ -46,6 +50,34 @@ docker --version
 docker info
 docker help
 ```
+<img src="images/docker_version.png" alt=" ">
+---
+
+## Docker Lab
+
+Lab Basic Commands
+
+Lab consists of 17 questions, Answers are submitted below according to their question number.
+
+1. 25.0.5
+2. 0
+3. 9
+4. <img src="images/lab1_4.png" alt=" ">
+5. <img src="images/lab1_5.png" alt=" ">
+6. 0
+7. 4
+8. 6
+9. nginx:alpine
+10. awesome_northcut
+11. 866
+12. Exited
+13. <img src="images/lab1_13.png" alt=" ">
+14. <img src="images/lab1_14.png" alt=" ">
+15. <img src="images/lab1_15.png" alt=" ">
+16. <img src="images/lab1_16.png" alt=" ">
+
+## Completion of Lab
+ <img src="images/labsuccess1.png" alt=" ">
 
 ---
 
@@ -55,11 +87,15 @@ docker help
 
 Images are read-only templates used to create containers.
 
+<img src="images/images.png" alt=" ">
+
 ---
 
 ## Docker Containers
 
 Containers are running instances of Docker images.
+
+<img src="images/containers.png" alt=" ">
 
 ---
 
@@ -128,6 +164,29 @@ docker exec <container_id> cat /etc/os-release
 docker exec -it <container_id> bash
 ```
 
+## Docker Lab
+
+Lab Docker Images
+Answers
+1. 9
+2. 7.81 MB
+3. 1.14 - alpine
+4. python:3.6
+5. /opt
+6. python app.py
+7. 8080
+8. <img src="images/lab2_8.png" alt=" ">
+9. docker run -p 8282 : 8080 webapp-color
+10. -
+11. -
+12. 920 MB
+13. <img src="images/lab2_13.png" alt=" ">
+14. <img src="images/lab2_14.png" alt=" ">
+15. <img src="images/lab2_15.png" alt=" ">
+
+## Completion of Lab
+ <img src="images/labsuccess2.png" alt=" ">
+
 ---
 
 # Unit 3: Dockerfile and Docker Compose
@@ -136,12 +195,14 @@ docker exec -it <container_id> bash
 
 A Dockerfile is a script that contains instructions to build a Docker image.
 
+<img src="images/dockerfile.png" alt=" ">
+
 ---
 
-## Example Dockerfile
+## Dockerfile
 
 ```dockerfile id="u3dockerfile"
-FROM node:18
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -223,5 +284,486 @@ docker network create mynetwork
 
 ---
 
+# Unit IV: CI/CD and Jenkins
+
+## What is CI/CD?
+
+**Continuous Integration** – Developers merge code into a shared branch multiple times a day. Each merge triggers an automatic build and runs unit tests. Catches problems immediately.
+
+**Continuous Delivery** – Code is always ready to deploy. But a person presses the button to actually send it to production. Good for businesses that need human approval.
+
+**Continuous Deployment** – Fully automated. Every change that passes all tests goes straight to production. No human click needed.
+
+**The pipeline flow:**
+Commit → Build → Unit Tests → Integration Tests → Deploy to Staging → (Manual approval for Delivery) → Production
+
+**Why use it?**
+- Find bugs early when they're cheap to fix
+- Deploy more often with less stress
+- Stop wasting time on manual testing and release steps
+- Team gains confidence to deploy anytime
+
+**Challenges:**
+- Takes time to set up properly
+- Requires good test coverage (bad tests = bad pipeline)
+- Team needs to change how they work
+
+---
+
+## Jenkins Architecture
+
+**Master (or Controller)**
+- Manages everything
+- Schedules jobs
+- Serves the web UI at port 8080
+- Stores configuration
+- Doesn't do the actual building
+
+**Agents (or Nodes)**
+- Do the actual work of building and testing
+- Can run on different operating systems
+- Master tells them what to run
+- More agents = parallel builds
+
+**Why separate?** You can have one master managing many agents. Master stays lightweight. Agents can be powerful machines or even containers.
+
+---
+
+## Jenkins Job Types
+
+**Freestyle Project**
+- Configure everything through the web UI
+- Good for simple stuff
+- Not version controllable
+- Losing popularity
+
+**Pipeline (Recommended)**
+- Define build process in a Jenkinsfile
+- Stored in your code repository
+- Can be reviewed like any other code
+- Survives Jenkins restarts
+
+**Multibranch Pipeline**
+- Automatically creates pipelines for each branch
+- Uses Jenkinsfile from that branch
+- Main branch → Production
+- Feature branches → Test first
+
+---
+
+## Jenkinsfile Basics (Declarative Syntax)
+
+```groovy
+pipeline {
+    agent any  // run on any available agent
+    
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Compiling code...'
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        
+        stage('Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'This runs no matter what'
+            junit '**/surefire-reports/*.xml'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Something broke'
+        }
+    }
+}
+```
+## Key parts:
+
+- `agent` – Where to run (any, label, docker, none)
+- `stages` – Container for all your stage blocks
+- `stage` – Logical section like Build, Test, Deploy
+- `steps` – Actual commands to execute
+- `post` – Cleanup based on result (always, success, failure, unstable)
+
+---
+
+## Build Triggers
+
+How to start a pipeline automatically:
+
+| Trigger | How it works |
+|---------|---------------|
+| Poll SCM | Jenkins checks Git every X minutes for changes |
+| GitHub webhook | GitHub pushes a notification to Jenkins on every commit |
+| Build periodically | Cron schedule (e.g., 2 AM daily for nightly tests) |
+| Upstream trigger | Start this job after another job finishes |
+| Generic trigger | Any system can call Jenkins API |
 
 
+---
+
+## Plugins
+
+Jenkins is basically useless without plugins. Core is just the engine.
+
+**Essential plugins:**
+- Git – Clone repositories
+- Pipeline – Run Jenkinsfile pipelines
+- JUnit – Parse and display test results
+- Blue Ocean – Modern UI
+- Docker – Build and run containers
+- Slack/Email – Notifications
+
+**How to install:** Manage Jenkins → Plugins → Available tab → Search → Install
+
+---
+
+## Build Steps and Post-Build Actions
+
+**Build steps** are what actually happens in your pipeline:
+- Execute shell script
+- Run Maven/Gradle/npm command
+- Invoke another job
+- Copy files
+
+**Post-build actions** happen after:
+- Publish test reports (so Jenkins shows pass/fail trends)
+- Archive artifacts (save JAR/WAR files)
+- Send email if build failed
+- Trigger dependent jobs
+- Deploy to server
+
+---
+
+
+# Unit V: Advanced Pipeline
+
+## Declarative vs Scripted Pipeline
+
+### Declarative (what we've been using)
+
+- Structured and opinionated
+- Easier to read and write
+- Blue Ocean visual editor works
+- Best for 80% of use cases
+
+### Scripted
+
+- Full Groovy programming language
+- More flexible and powerful
+- Can use loops, if/else, try/catch naturally
+- Steeper learning curve
+- Use when Declarative is too limiting
+
+### Example Comparison
+
+**Declarative example:**
+
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps { 
+                sh 'make' 
+            }
+        }
+    }
+}
+```
+
+**Scripted example:**
+
+```groovy
+node('any') {
+    stage('Build') {
+        sh 'make'
+        if (currentBuild.result == 'SUCCESS') {
+            echo 'Build good'
+        }
+    }
+}
+```
+
+### When to choose which
+
+| Scenario | Recommendation |
+|----------|----------------|
+| New to Jenkins | Start Declarative |
+| Need complex conditionals or loops | Scripted |
+| Want to share library code | Scripted works better |
+| Most production pipelines | Declarative is fine |
+
+---
+
+## Pipeline as Code
+
+The main idea: Your pipeline definition lives in your code repository, not in Jenkins UI.
+
+
+### Why this matters
+
+- Pipeline changes go through code review
+- Branch has its own pipeline (main vs feature)
+- History of pipeline changes
+- Can rollback pipeline like any other code
+
+---
+
+### Use in Jenkinsfile
+
+```groovy
+@Library('my-shared-library') _
+
+pipeline {
+    stages {
+        stage('Deploy') {
+            steps {
+                slackNotify('Deploying to production')
+            }
+        }
+    }
+}
+```
+
+---
+
+## Integrating External Tools
+
+### Source Control (Git)
+
+```groovy
+stage('Checkout') {
+    steps {
+        git branch: 'main',
+            url: 'https://github.com/myorg/myapp.git',
+            credentialsId: 'github-creds'
+    }
+}
+```
+
+### Build Tools
+
+**Maven:**
+
+```groovy
+stage('Build') {
+    steps {
+        sh 'mvn clean package'
+    }
+}
+```
+
+**npm/Node:**
+
+```groovy
+stage('Build') {
+    steps {
+        sh 'npm ci'
+        sh 'npm run build'
+    }
+}
+```
+
+### Artifact Repositories (Nexus/Artifactory)
+
+Store your built JARs, Docker images, or npm packages.
+
+```groovy
+stage('Upload') {
+    steps {
+        sh 'curl -u user:pass --upload-file myapp.war http://nexus/releases/'
+    }
+}
+```
+
+---
+
+## Testing in Pipelines
+
+### Unit Tests
+
+```groovy
+stage('Unit Tests') {
+    steps {
+        sh 'mvn test'
+    }
+    post {
+        always {
+            junit 'target/surefire-reports/*.xml'
+        }
+    }
+}
+```
+
+The `junit` step parses test results. Jenkins shows a graph over time. Failing tests make the build unstable (yellow) instead of failing completely (red).
+
+### Integration Tests
+
+Test how services talk to each other. Often needs databases, message queues, or other services running.
+
+### End-to-End Tests
+
+Full browser or API tests. Slow but catch real user-facing issues.
+
+### Test Types Summary
+
+| Test Type | Speed | What it catches |
+|-----------|-------|-----------------|
+| Unit | Fast | Logic bugs |
+| Integration | Medium | Service communication |
+| E2E | Slow | Real user flows |
+
+---
+
+## Common Pipeline Patterns
+
+### Parallel Execution
+
+Run multiple tests at once to save time:
+
+```groovy
+stage('Parallel Tests') {
+    parallel {
+        stage('Unit') { 
+            steps { 
+                sh 'npm run test:unit' 
+            } 
+        }
+        stage('Integration') { 
+            steps { 
+                sh 'npm run test:integration' 
+            } 
+        }
+        stage('E2E') { 
+            steps { 
+                sh 'npm run test:e2e' 
+            } 
+        }
+    }
+}
+```
+
+### Conditional Execution
+
+Only deploy if tests passed:
+
+```groovy
+stage('Deploy') {
+    when { 
+        branch 'main' 
+    }
+    steps { 
+        sh 'deploy.sh' 
+    }
+}
+```
+
+### Post Actions
+
+Run cleanup regardless of build status:
+
+```groovy
+post {
+    always {
+        echo 'This will always run'
+        cleanWs()
+    }
+    success {
+        echo 'Build succeeded!'
+    }
+    failure {
+        echo 'Build failed!'
+    }
+}
+```
+
+### Environment Variables
+
+```groovy
+pipeline {
+    environment {
+        APP_NAME = 'myapp'
+        VERSION = '1.0.0'
+    }
+    stages {
+        stage('Print Version') {
+            steps {
+                echo "Building ${APP_NAME} version ${VERSION}"
+            }
+        }
+    }
+}
+```
+
+### Credentials Management
+
+Never hardcode passwords:
+
+```groovy
+pipeline {
+    environment {
+        DOCKER_PASSWORD = credentials('docker-hub-creds')
+    }
+    stages {
+        stage('Docker Login') {
+            steps {
+                sh 'echo $DOCKER_PASSWORD | docker login -u myuser --password-stdin'
+            }
+        }
+    }
+}
+```
+
+### Input Steps (Manual Approval)
+
+```groovy
+stage('Deploy to Production') {
+    input {
+        message "Deploy to production?"
+        ok "Yes, deploy now"
+        submitter "admin"
+    }
+    steps {
+        sh 'deploy-prod.sh'
+    }
+}
+```
+
+---
+
+## Best Practices Summary
+
+| Practice | Why |
+|----------|-----|
+| Keep Jenkinsfile in SCM | Version control + code review |
+| Use Declarative pipeline | Easier to read and maintain |
+| Run parallel tests | Save time |
+| Publish test results | Track quality over time |
+| Use credentials plugin | Never hardcode secrets |
+| Clean workspace | Prevent disk full issues |
+| Use shared libraries | Don't repeat yourself |
+
+---
+
+## References
+
+- Jenkins Pipeline Documentation: https://www.jenkins.io/doc/book/pipeline/
+- Pipeline Syntax Reference: https://www.jenkins.io/doc/book/pipeline/syntax/
+- Shared Libraries: https://www.jenkins.io/doc/book/pipeline/shared-libraries/
+- Blue Ocean: https://www.jenkins.io/projects/blueocean/
