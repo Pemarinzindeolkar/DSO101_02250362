@@ -1,11 +1,5 @@
 # CI/CD Assignment A2 - Continuous Integration and Continuous Deployment
 
-**Course:** DS0101 - Continuous Integration and Continuous Deployment  
-**Program:** Bachelor's of Engineering in Software Engineering (SWE)  
-**Student:** Pema Rinzin Deolkar  
-**GitHub Repository:** [DSO101_02250362](https://github.com/Pemarinzindeolkar/DSO101_02250362)
-
----
 
 ##  Assignment Overview
 
@@ -176,7 +170,7 @@ npm install --save-dev jest-junit
 
 ---
 
-## 🔗 References
+##  References
 
 - Jenkins Documentation: https://www.jenkins.io/doc/
 - Node.js Jenkins Plugin: https://plugins.jenkins.io/nodejs/
