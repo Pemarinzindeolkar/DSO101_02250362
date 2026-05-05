@@ -1,0 +1,34 @@
+name: Task Manager CI/CD
+
+on:
+  push:
+    paths:
+      - 'task-manager/**'
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      
+      - name: Install dependencies
+        run: |
+          cd task-manager
+          pip install -r requirements.txt
+      
+      - name: Verify Flask app
+        run: |
+          cd task-manager
+          python -c "import app; print('Flask app loaded successfully')"
+      
+      - name: Deploy to Render
+        run: echo "Deployment will be configured after Render setup"
