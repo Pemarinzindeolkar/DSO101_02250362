@@ -82,17 +82,27 @@ docker build --platform linux/amd64 -t pemarinzindeolkar17/fe-todo:02250362 ./fr
 
 # Push frontend
 docker push pemarinzindeolkar17/fe-todo:02250362
-<img src="images/docker_backend.png" alt="Backend image on Docker Desktop"> <img src="images/docker_frontend.png" alt="Frontend image on Docker Desktop"> <img src="images/dockerhub.png" alt="DockerHub showing both images">
+
+# Screenshots
+<img src="images/be_todo.png" alt="Backend image on Docker Desktop"> 
+<img src="images/fe_todo.png" alt="Frontend image on Docker Desktop"> 
+<img src="images/dashboard.png" alt="DockerHub showing both images">
+
+<br>
 Task 4: PostgreSQL Database on Render
-
 Created a PostgreSQL database on Render with the following details:
-
+<br>
 Field	Value
+<br>
 Hostname	dpg-d7odivi8qa3s73ahr2ng-a.singapore-postgres.render.com
+<br>
 Username	my_todo_db_vzjq_user
+<br>
 Password	CjybHWbIalaW1GcEIJBir4Vg9nCNT0bf
+<br>
 Database	my_todo_db_vzjq
-<img src="images/render_db.png" alt="PostgreSQL database on Render">
+<img src="images/render.png" alt="PostgreSQL database on Render">
+
 Task 5: Render Blueprint File (render.yaml)
 
 Created render.yaml in the repository root:
@@ -119,7 +129,7 @@ services:
     envVars:
       - key: REACT_APP_API_URL
         value: https://be-todo-api.onrender.com
-<img src="images/render_yaml.png" alt="render.yaml file in GitHub">
+<img src="images/render.png" alt="render.yaml file in GitHub">
 Task 6: Deploy on Render.com
 Went to Render → New + → Blueprint
 Connected GitHub repository
