@@ -30,5 +30,6 @@ jobs:
           cd recipe-book
           python -c "import app; print('Recipe Book Flask app loaded successfully')"
       
-      - name: Deploy to Render
-        run: echo "Deployment will be configured after Render setup"
+      - name: Trigger Render Deployment
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
