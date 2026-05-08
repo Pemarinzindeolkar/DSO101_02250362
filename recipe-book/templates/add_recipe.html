@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Add Recipe{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1 style="margin-bottom: 24px; color: #4a3e2f;">Add New Recipe</h1>
+    
+    <form method="POST" action="/add">
+        <div class="form-group">
+            <label>Recipe Name *</label>
+            <input type="text" name="name" required placeholder="e.g., Ema Datshi">
+        </div>
+
+        <div class="form-group">
+            <label>Category *</label>
+            <select name="category" required>
+                <option value="">Select category</option>
+                <option value="Cheese Dish">Cheese Dish (Datshi)</option>
+                <option value="Meat Dish">Meat Dish (Paa)</option>
+                <option value="Vegetable Dish">Vegetable Dish (Tshoem)</option>
+                <option value="Soup">Soup (Thukpa)</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Ingredients * (one per line)</label>
+            <textarea name="ingredients" required placeholder="e.g.:
+120g Fresh Green Chillies
+32g Spring Onions
+140g Farm Cheese"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Instructions *</label>
+            <textarea name="instructions" required placeholder="Step by step cooking instructions..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Cooking Time</label>
+            <input type="text" name="cooking_time" placeholder="e.g., 10-15 minutes">
+        </div>
+
+        <button type="submit" class="btn">Add Recipe</button>
+        <a href="/" class="btn-secondary btn" style="margin-left: 10px;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

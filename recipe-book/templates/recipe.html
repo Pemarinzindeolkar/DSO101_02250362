@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.name }}{% endblock %}
+
+{% block content %}
+<div class="recipe-detail">
+    <div class="recipe-header">
+        <h1>{{ recipe.name }}</h1>
+        <div class="recipe-meta">
+            Category: {{ recipe.category }} | Cooking Time: {{ recipe.cooking_time }}
+        </div>
+    </div>
+
+    <div class="recipe-section">
+        <h3>Ingredients</h3>
+        <ul class="ingredients-list">
+            {% for line in recipe.ingredients.split('\n') %}
+                {% if line.strip() %}
+                    <li>• {{ line }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="recipe-section">
+        <h3>Instructions</h3>
+        <div class="instructions-text">{{ recipe.instructions }}</div>
+    </div>
+
+    {% if recipe.image_credit %}
+    <div class="credit">
+        Source: {{ recipe.image_credit }}
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 24px;">
+        <a href="/" class="btn btn-secondary">← Back to all recipes</a>
+        <a href="/delete/{{ recipe.id }}" class="btn btn-danger" onclick="return confirm('Delete this recipe?')" style="margin-left: 10px;">Delete Recipe</a>
+    </div>
+</div>
+{% endblock %}
