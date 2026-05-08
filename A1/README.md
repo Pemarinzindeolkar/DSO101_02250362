@@ -44,11 +44,14 @@ COPY . .
 EXPOSE 5000
 
 CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+
+----
+
 Task 2: Frontend Dockerfile
 
 Created a Dockerfile in the frontend folder:
 
-# Build stage
+### Build stage
 FROM node:22-alpine AS builder
 
 WORKDIR /app
@@ -59,7 +62,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Production stage
+### Production stage
 FROM nginx:stable-alpine
 
 COPY --from=builder /app/build /usr/share/nginx/html
@@ -67,26 +70,26 @@ COPY --from=builder /app/build /usr/share/nginx/html
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
+
+----
+
 Task 3: Build and Push Docker Images
 
 Built both images for the linux/amd64 platform (required by Render) and pushed to DockerHub.
 
-# Build backend
+### Build backend
 docker build --platform linux/amd64 -t pemarinzindeolkar17/be-todo:02250362 ./backend
 
-# Push backend
+### Push backend
 docker push pemarinzindeolkar17/be-todo:02250362
 
-# Build frontend
+### Build frontend
 docker build --platform linux/amd64 -t pemarinzindeolkar17/fe-todo:02250362 ./frontend
 
-# Push frontend
+### Push frontend
 docker push pemarinzindeolkar17/fe-todo:02250362
 
-# Screenshots
-<img src="images/be_todo.png" alt="Backend image on Docker Desktop"> 
-<img src="images/fe_todo.png" alt="Frontend image on Docker Desktop"> 
-<img src="images/dashboard.png" alt="DockerHub showing both images">
+----
 
 <br>
 Task 4: PostgreSQL Database on Render
@@ -101,7 +104,13 @@ Username	my_todo_db_vzjq_user
 Password	CjybHWbIalaW1GcEIJBir4Vg9nCNT0bf
 <br>
 Database	my_todo_db_vzjq
+
+<img src="images/env_var_be.png" alt=""> 
+<img src="images/env_var_fe.png" alt=""> 
 <img src="images/render.png" alt="PostgreSQL database on Render">
+
+
+----
 
 Task 5: Render Blueprint File (render.yaml)
 
@@ -129,7 +138,13 @@ services:
     envVars:
       - key: REACT_APP_API_URL
         value: https://be-todo-api.onrender.com
-<img src="images/render.png" alt="render.yaml file in GitHub">
+<img src="images/be_todo.png" alt="Backend image on Docker Desktop"> 
+<img src="images/fe_todo.png" alt="Frontend image on Docker Desktop"> 
+
+<img src="images/dashboard.png" alt="DockerHub showing both images">
+
+----
+
 Task 6: Deploy on Render.com
 Went to Render → New + → Blueprint
 Connected GitHub repository
@@ -137,20 +152,17 @@ Applied the configuration from render.yaml
 
 Render automatically deployed both services.
 
-<img src="images/render_services.png" alt="Both services running on Render">
+<img src="images/auto_deploy.png" alt="Render Auto-Deploy setting">
+
 ## FINAL VERIFICATION
-Backend API:
-https://be-todo-api.onrender.com/tasks
-Frontend App:
-https://fe-todo.onrender.com
-Auto-deployment:
-Any push to GitHub triggers automatic redeployment on Render
-<img src="images/live_frontend.png" alt="Live frontend application"> <img src="images/postman_test.png" alt="Backend API test in Postman">
+<img src="images/dashboard.png" alt="Live frontend application"> 
+<img src="images/fe_todo.png" alt="Live frontend application"> 
+
 ## CONCLUSION
 
 In this project, I successfully containerised a full-stack To-Do application using Docker. Separate Dockerfiles were created for the React frontend and Node.js backend. Both images were built and pushed to DockerHub using my student ID as the tag, and deployed on Render using a render.yaml Blueprint configuration.
 
-One major challenge was building Docker images for the correct platform. Since my system uses ARM64 architecture, I had to explicitly specify --platform linux/amd64 to ensure compatibility with Render’s infrastructure.
+One major challenge was building Docker images for the correct platform. Since my system uses ARM64 architecture, I had to explicitly specify platform linux/amd64 to ensure compatibility with Render’s infrastructure.
 
 Another issue was enabling communication between the frontend and backend services. This was resolved by setting the REACT_APP_API_URL environment variable in the frontend service to point to the backend API.
 
