@@ -226,4 +226,3 @@ The application stores recipes in a file called `recipes.json` inside the `recip
 - Gunicorn Documentation: https://gunicorn.org/
 - UNESCAP: www.unescap.org
 - MECS Programme: www.mecs.org.uk
-```
