@@ -137,7 +137,7 @@ The instructor explained that this workflow:
 | Runner environment | Ephemeral per job | Persistent until next deploy |
 | Cost model | Free minutes per month for public repos | Free tier with limits |
 
-## Part 10: Limitations Mentioned by Instructor
+## Part 10: Limitations Mentioned
 
 GitHub Actions workflows cannot run longer than a certain time limit depending on plan limits. Public repositories have generous free minutes but private repositories consume minutes from account quota.
 
