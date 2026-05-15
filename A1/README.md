@@ -146,7 +146,8 @@ services:
 ----
 
 Task 6: Deploy on Render.com
-Went to Render → New + → Blueprint
+
+Render → New + → Blueprint
 Connected GitHub repository
 Applied the configuration from render.yaml
 
