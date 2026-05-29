@@ -177,8 +177,8 @@ Answers
 7. 8080
 8. <img src="images/lab2_8.png" alt=" ">
 9. docker run -p 8282 : 8080 webapp-color
-10. -
-11. -
+10. correct - ok
+11. Debian
 12. 920 MB
 13. <img src="images/lab2_13.png" alt=" ">
 14. <img src="images/lab2_14.png" alt=" ">
@@ -576,7 +576,8 @@ on:
 ```
 
 # Unit V: Advanced Pipeline
-
+### Defination of pipeline by sir
+- it needs continous flow of automation
 ## Declarative vs Scripted Pipeline
 
 ### Declarative (what we've been using)
