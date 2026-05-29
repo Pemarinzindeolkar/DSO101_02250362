@@ -284,6 +284,55 @@ docker network create mynetwork
 
 ---
 
+## Optimize Docker Image for Production + Security
+
+### Multi-Stage Build (Smaller Image)
+
+```dockerfile
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM node:22-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+CMD ["node", "server.js"]
+```
+
+### .dockerignore (Create this file)
+
+```text
+node_modules/
+.git/
+.env
+*.log
+```
+
+### Non-Root User (Security)
+
+```dockerfile
+RUN addgroup -g 1001 -S appuser && adduser -S appuser -u 1001
+USER appuser
+```
+
+### Image Scanning
+
+```bash
+docker scout quick my-app
+trivy image my-app
+```
+
+### Resource Limits
+
+```bash
+docker run --memory="512m" --cpus="1" --read-only my-app
+```
+
+---
+
+
 # Unit IV: CI/CD and Jenkins
 
 ## What is CI/CD?
@@ -449,7 +498,82 @@ Jenkins is basically useless without plugins. Core is just the engine.
 - Deploy to server
 
 ---
+## What is GitHub Actions?
 
+CI/CD platform built into GitHub. No external server needed.
+
+## Core Concepts
+
+| Concept | Meaning |
+|---------|---------|
+| Workflow | YAML file in .github/workflows/ |
+| Event | Trigger (push, pull_request) |
+| Job | Set of steps on one runner |
+| Action | Reusable component |
+
+---
+
+## Complete CI/CD with GitHub Actions
+
+### Workflow File (.github/workflows/deploy.yml)
+
+```yaml
+name: CI/CD
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /app
+            git pull
+            docker-compose up -d --build
+```
+
+### Setup Secrets (GitHub UI)
+
+Settings → Secrets → Actions → Add:
+
+- **HOST** = Server IP
+- **USER** = SSH username
+- **SSH_KEY** = Private key
+
+### Deployment Methods
+
+| Method | Command/Action |
+|--------|----------------|
+| SSH + Docker | appleboy/ssh-action |
+| SCP Files | appleboy/scp-action |
+| rsync | run: rsync -avz ./dist/ user@host:/var/www/ |
+
+### Common Triggers
+
+```yaml
+on: 
+  push: { branches: [main] }
+  pull_request:
+  workflow_dispatch:  # Manual button
+  
+```
 
 # Unit V: Advanced Pipeline
 
@@ -765,5 +889,3 @@ stage('Deploy to Production') {
 
 - Jenkins Pipeline Documentation: https://www.jenkins.io/doc/book/pipeline/
 - Pipeline Syntax Reference: https://www.jenkins.io/doc/book/pipeline/syntax/
-- Shared Libraries: https://www.jenkins.io/doc/book/pipeline/shared-libraries/
-- Blue Ocean: https://www.jenkins.io/projects/blueocean/
